@@ -7,6 +7,8 @@ import ActivityDashboard from "../../features/activities/dashboard/ActivityDashb
 
 function App() {
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [selectedActivity, setSelectedActivity] = useState<Activity | undefined>(undefined);
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     axios.get<Activity[]>("https://localhost:5001/api/Activities").then(response => {
@@ -14,11 +16,44 @@ function App() {
     });
   }, []);
 
+  function handleSelectActivity(id: string) {
+    setSelectedActivity(activities.find(activity => activity.id === id))
+  }
+
+  function handleCancelSelectActivity() {
+    setSelectedActivity(undefined);
+  }
+
+  function handleFormOpen(id?: string){
+    id ? handleSelectActivity(id) : handleCancelSelectActivity();
+    setEditMode(true);
+  }
+
+  function handleFormClose() {
+    setEditMode(false);
+  }
+
+  function handleCreateOrEditActivity(activity: Activity) {
+    activity.id ? setActivities([...activities.filter(x => x.id != activity.id), activity])
+      : setActivities([...activities, activity]);
+    setEditMode(false);
+    setSelectedActivity(activity);
+  }
+
   return (
     <Fragment>
-      <NavBar />
+      <NavBar openForm={handleFormOpen} />
       <Container style={{marginTop: '7em'}}>
-        <ActivityDashboard activities={activities} />
+        <ActivityDashboard 
+          activities={activities} 
+          selectedActivity={selectedActivity} 
+          selectActivity={handleSelectActivity} 
+          cancelSelectActivity={handleCancelSelectActivity}
+          editMode={editMode} 
+          openForm={handleFormOpen} 
+          closeForm={handleFormClose}
+          createOrEdit={handleCreateOrEditActivity}
+        />
       </Container>
     </Fragment>
   );
