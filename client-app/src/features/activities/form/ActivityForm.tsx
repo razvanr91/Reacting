@@ -1,5 +1,4 @@
 import React, { ChangeEvent, useState } from "react";
-import { act } from "react-dom/test-utils";
 import { Button, Form, Segment } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
 
